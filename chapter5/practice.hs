@@ -1,26 +1,29 @@
 
-factors1 ::Int -> [Int]
+-- List comprehensions
+
+
+-- {1, 4, 9, 16, 25}
+-- | is such that
+-- <- is drawn from
+-- expression x <- [1..5] is called a generator
+
+concat :: [[a]] -> [a]
+concat xss = [x | xs <- xss, x <- xs]
+
+
+firsts :: [(a, b)] -> [a]
+firsts ps = [x | (x, _) <- ps]
+
+
+length1 :: [a] -> Int
+length1 xs = sum [1 | _ <- xs]
+
+
+factors1 :: Int -> [Int]
 factors1 n = [x | x <- [1..n], n `mod` x == 0]
 
+isPrime :: Int -> Bool
+isPrime n = factors1 n == [1, n]
 
-primes :: Int -> Bool
-primes n = factors1 n == [1,n]
-
-
-zip1 :: [a] -> [b] -> [(a,b)]
-zip1 (x:xs) (y:ys) = [(x, y)] ++ zip1 xs ys
-zip1 _ _ = []
-
-
-count1 :: Int -> [Int] -> Int
-count1 x xs =  head( reverse [i | x' <- xs, x' == x, i <- [0..]])
-
-filter1 :: (a -> Bool) -> [a] -> [a]
-filter1 f (x:xs)
-    | f x = x:filter1 f xs
-    | otherwise = filter1 f xs
-filter1 f [] = []
-
-
-reverse1:: [a] -> [a]
-reverse1 = foldr (\x xs -> xs ++ [x]) []
+positions :: Eq a => a -> [a] -> [Int]
+positions x xs = [i | (x', i) <- zip xs [0..], x == x']
