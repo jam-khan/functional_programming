@@ -27,3 +27,5 @@ isPrime n = factors1 n == [1, n]
 
 positions :: Eq a => a -> [a] -> [Int]
 positions x xs = [i | (x', i) <- zip xs [0..], x == x']
+
+
