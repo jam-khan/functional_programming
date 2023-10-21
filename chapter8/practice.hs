@@ -74,7 +74,6 @@ safehead (x:xs) = Main.Just x
 -- newtype Nat = N Int 
 -- type Na
 -- newtype Nat = N Int 
-data Nat = Zero | Succ Nat deriving Show 
 
 nat2int :: Nat -> Int 
 nat2int Zero = 0
@@ -98,7 +97,7 @@ len (Cons _ xs) = 1 + len xs
 
 
 -- Suitable type for Tree
-data Tree a = Leaf a | Node (Tree a) a (Tree a)
+data Tree a = Leaf a | Node (Tree a) a (Tree a) deriving Show
 
 t:: Tree Int
 t = Node (Node (Leaf 1) 3 (Leaf 4)) 5 (Node (Leaf 6) 7 (Leaf 9))
@@ -248,3 +247,51 @@ substs p = [zip vs b | b <- bs]
 
 isTaut :: Prop -> Bool
 isTaut p = and [eval s p | s <- substs p]
+
+
+-- Abstract Machine
+
+data Expr = Val Int | Add Expr Expr 
+
+value :: Expr -> Int
+value (Val x) = x
+value (Add x y) = value x + value y 
+
+
+-- Creating an abstract machine
+-- to control the order of execution
+
+type Cont = [Op]
+data Op = EVAL Expr | ADD Int
+
+eval1 :: Expr -> Cont -> Int 
+eval1 (Val n)    c = exec c n
+eval1 (Add x y)  c = eval1 y (EVAL x : c)
+
+exec :: Cont -> Int -> Int 
+exec []           n = n 
+exec (EVAL y : c) n = eval1 y (ADD n : c)
+exec (ADD n : c)  m = exec c (n + m)
+
+value1 :: Expr -> Int 
+value1 e = eval1 e []
+
+
+
+
+data Nat = Zero | Succ Nat deriving Show 
+
+-- Exercises
+-- Exercise 1
+mult :: Nat -> Nat -> Nat
+mult (Succ n) m = foldr (\x acc -> add acc x) Zero [m | i <- [0..(nat2int n)]]
+
+
+-- Exercise 2
+
+occurs1 :: Ord a => a -> Tree a -> Bool
+occurs1 x (Leaf y) = x == y 
+occurs1 x (Node l m r) = case compare x m of 
+                            EQ -> True
+                            LT -> occurs1 x l
+                            GT -> occurs1 x r 
